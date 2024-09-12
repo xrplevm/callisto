@@ -30,8 +30,8 @@ jobs:
         run: |
           CHAIN_NAME="${{env.CHAIN_NAME}}"
           VERSION="${{env.GITHUB_VERSION}}"
-          TAGS="${{env.IMAGE_NAME}}:${CHAIN_NAME}-${VERSION:-latest}"
-          echo ::set-output name=version::${VERSION:-latest}
+          TAGS="${{env.IMAGE_NAME}}:${CHAIN_NAME}-${VERSION}"
+          echo ::set-output name=version::${VERSION}
           echo ::set-output name=tags::${TAGS}
           echo ::set-output name=created::$(date -u +'%Y-%m-%dT%H:%M:%SZ')
 
@@ -60,4 +60,4 @@ jobs:
           context: .
           file: "./${{ env.DOCKERFILE }}"
           push: true
-          tags: ${{ steps.prep.outputs.tags }}
+          tags: xrplevm/callisto:latest
