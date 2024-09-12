@@ -18,7 +18,7 @@ import (
 	"github.com/forbole/callisto/v4/database"
 	"github.com/forbole/callisto/v4/modules"
 
-	exrp "github.com/xrplevm/node/v2/app"
+	exrp "github.com/xrplevm/node/v3/app"
 )
 
 func main() {
