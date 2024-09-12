@@ -60,4 +60,4 @@ jobs:
           context: .
           file: "./${{ env.DOCKERFILE }}"
           push: true
-          tags: xrplevm/callisto:latest
+          tags: ghcr.io/xrplevm/callisto:latest
