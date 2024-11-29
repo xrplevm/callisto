@@ -29,6 +29,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/gogoproto/proto"
+	"github.com/evmos/evmos/v20/x/evm"
+	"github.com/evmos/evmos/v20/x/feemarket"
+	"github.com/xrplevm/node/v4/x/poa"
 )
 
 var once sync.Once
@@ -70,6 +73,9 @@ func getBasicManagers() module.BasicManager {
 		groupmodule.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		consensus.AppModuleBasic{},
+		poa.AppModuleBasic{},
+		evm.AppModuleBasic{},
+		feemarket.AppModuleBasic{},
 	)
 }
 

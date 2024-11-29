@@ -61,7 +61,7 @@ func TestWeightVoteOptionFromEvents(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			result, err := gov.WeightVoteOptionFromEvents(test.events)
+			result, err := gov.WeightVoteOptionsFromEvents(test.events)
 			if test.shouldErr {
 				require.Error(t, err)
 			} else {
