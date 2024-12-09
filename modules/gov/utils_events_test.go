@@ -6,8 +6,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
-	"github.com/forbole/callisto/v4/modules/gov"
 	"github.com/stretchr/testify/require"
+
+	"github.com/forbole/callisto/v4/modules/gov"
 )
 
 func TestWeightVoteOptionFromEvents(t *testing.T) {
@@ -60,7 +61,7 @@ func TestWeightVoteOptionFromEvents(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			result, err := gov.WeightVoteOptionFromEvents(test.events)
+			result, err := gov.WeightVoteOptionsFromEvents(test.events)
 			if test.shouldErr {
 				require.Error(t, err)
 			} else {
