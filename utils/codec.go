@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"github.com/evmos/evmos/v20/encoding"
 	"sync"
 
 	"cosmossdk.io/x/evidence"
@@ -39,10 +40,10 @@ var cdc *codec.ProtoCodec
 
 func GetCodec() codec.Codec {
 	once.Do(func() {
-		interfaceRegistry := codectypes.NewInterfaceRegistry()
-		getBasicManagers().RegisterInterfaces(interfaceRegistry)
-		std.RegisterInterfaces(interfaceRegistry)
-		cdc = codec.NewProtoCodec(interfaceRegistry)
+		encodingConfig := encoding.MakeConfig()
+		getBasicManagers().RegisterInterfaces(encodingConfig.InterfaceRegistry)
+		std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+		cdc = codec.NewProtoCodec(encodingConfig.InterfaceRegistry)
 	})
 	return cdc
 }
