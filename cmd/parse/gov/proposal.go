@@ -125,14 +125,10 @@ func refreshProposalDetails(parseCtx *parser.Context, proposalID uint64, govModu
 	}
 
 	// Handle the MsgSubmitProposal messages
-	for index, msg := range tx.GetMsgs() {
-
-		switch msg.(type) {
-		case *govtypesv1.MsgSubmitProposal, *govtypesv1beta1.MsgSubmitProposal:
-			err = govModule.HandleMsg(index, tx.Body.Messages[index], tx)
-			if err != nil {
-				return fmt.Errorf("error while handling MsgSubmitProposal: %s", err)
-			}
+	for index := range tx.Body.Messages {
+		err = govModule.HandleMsg(index, tx.Body.Messages[index], tx)
+		if err != nil {
+			return fmt.Errorf("error while handling MsgSubmitProposal: %s", err)
 		}
 	}
 
@@ -156,13 +152,10 @@ func refreshProposalDeposits(parseCtx *parser.Context, proposalID uint64, govMod
 		}
 
 		// Handle the MsgDeposit messages
-		for index, msg := range junoTx.GetMsgs() {
-			switch msg.(type) {
-			case *govtypesv1.MsgDeposit, *govtypesv1beta1.MsgDeposit:
-				err = govModule.HandleMsg(index, junoTx.Body.Messages[index], junoTx)
-				if err != nil {
-					return fmt.Errorf("error while handling MsgDeposit: %s", err)
-				}
+		for index := range junoTx.Body.Messages {
+			err = govModule.HandleMsg(index, junoTx.Body.Messages[index], junoTx)
+			if err != nil {
+				return fmt.Errorf("error while handling MsgDeposit: %s", err)
 			}
 		}
 	}
