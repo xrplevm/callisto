@@ -44,11 +44,15 @@ func (m *Module) convertValidator(height int64, validator stakingtypes.Validator
 		return nil, fmt.Errorf("error while getting validator consensus pub key: %s", err)
 	}
 
+	valAddr, err := sdk.ValAddressFromBech32(validator.GetOperator())
+	if err != nil {
+		return nil, fmt.Errorf("error while getting validator address: %s", err)
+	}
 	return types.NewValidator(
 		consAddr.String(),
 		validator.OperatorAddress,
 		consPubKey.String(),
-		sdk.AccAddress(validator.GetOperator()).String(),
+		sdk.AccAddress(valAddr).String(),
 		&validator.Commission.MaxChangeRate,
 		&validator.Commission.MaxRate,
 		height,
