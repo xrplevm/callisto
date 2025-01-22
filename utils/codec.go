@@ -32,7 +32,7 @@ import (
 	"github.com/cosmos/gogoproto/proto"
 	"github.com/evmos/evmos/v20/x/evm"
 	"github.com/evmos/evmos/v20/x/feemarket"
-	"github.com/xrplevm/node/v4/x/poa"
+	"github.com/xrplevm/node/v6/x/poa"
 )
 
 var once sync.Once
