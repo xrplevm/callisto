@@ -2,6 +2,7 @@ package utils
 
 import (
 	"github.com/evmos/evmos/v20/encoding"
+	"github.com/evmos/evmos/v20/x/erc20"
 	"sync"
 
 	"cosmossdk.io/x/evidence"
@@ -77,6 +78,7 @@ func getBasicManagers() module.BasicManager {
 		poa.AppModuleBasic{},
 		evm.AppModuleBasic{},
 		feemarket.AppModuleBasic{},
+		erc20.AppModuleBasic{},
 	)
 }
 
