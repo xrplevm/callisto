@@ -152,7 +152,18 @@ db-size:
 ###                              Local development                          ###
 ###############################################################################
 
-start: update-config build
+setup-env:
+	@ARCH=$$(uname -m); \
+	if [ "$$ARCH" = "arm64" ] || [ "$$ARCH" = "aarch64" ]; then \
+		echo "HASURA_IMAGE_SUFFIX=.ubuntu.arm64" > .env; \
+		echo "Detected ARM architecture"; \
+	else \
+		echo "HASURA_IMAGE_SUFFIX=" > .env; \
+		echo "Detected x86 architecture"; \
+	fi
+.PHONY: setup-env
+
+start: setup-env update-config build
 	@echo "Starting database services..."
 	@docker compose up -d
 	@echo "Waiting for database to be ready..."
@@ -161,7 +172,7 @@ start: update-config build
 	@./build/callisto start
 .PHONY: start
 
-start-clean: update-config build
+start-clean: setup-env update-config build
 	@echo "Starting database services..."
 	@docker compose up -d
 	@echo "Waiting for database to be ready..."
