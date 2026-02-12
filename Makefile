@@ -99,6 +99,18 @@ clean:
 ###############################################################################
 
 update-config:
+	@if [ -z "$(CONFIG)" ]; then \
+		echo "Error: CONFIG variable is not set."; \
+		echo "Please specify a config file using CONFIG=<path> or use one of:"; \
+		echo "  make start-testnet        (uses configs/testnet-config.yaml)"; \
+		echo "  make start-mainnet        (uses configs/mainnet-config.yaml)"; \
+		echo "  make start CONFIG=<path>  (uses your custom config)"; \
+		exit 1; \
+	fi
+	@if [ ! -f "$(CONFIG)" ]; then \
+		echo "Error: Config file '$(CONFIG)' does not exist."; \
+		exit 1; \
+	fi
 	@echo "Copying $(CONFIG) to ~/.callisto/config.yaml..."
 	@mkdir -p ~/.callisto
 	@cp $(CONFIG) ~/.callisto/config.yaml
@@ -114,7 +126,6 @@ init-config:
 ###                                Database                                ###
 ###############################################################################
 
-DB_CONTAINER := $(shell docker compose ps -q database 2>/dev/null)
 DB_EXEC := docker compose exec -T database psql -U user -d database
 
 db-schema-drop:

@@ -2,7 +2,7 @@ package evm
 
 import (
 	"os"
-	"path"
+	"path/filepath"
 	"testing"
 
 	"github.com/forbole/juno/v6/types/config"
@@ -22,19 +22,42 @@ evm:
 	invalidYaml := []byte(`invalid`)
 
 	t.Run("Valid YAML", func(t *testing.T) {
-		cfg := ParseConfig(validYaml)
+		cfg, err := ParseConfig(validYaml)
+		require.NoError(t, err)
 		require.Equal(t, uint64(12345), cfg.ChainID)
 	})
 
 	t.Run("Invalid YAML", func(t *testing.T) {
-		cfg := ParseConfig(invalidYaml)
+		cfg, err := ParseConfig(invalidYaml)
+		require.NoError(t, err)
 		require.Equal(t, DefaultConfig(), cfg)
 	})
 
 	t.Run("Missing EVM Config", func(t *testing.T) {
 		missingEvmYaml := []byte(`other: value`)
-		cfg := ParseConfig(missingEvmYaml)
+		cfg, err := ParseConfig(missingEvmYaml)
+		require.NoError(t, err)
 		require.Equal(t, DefaultConfig(), cfg)
+	})
+
+	t.Run("Missing chain_id", func(t *testing.T) {
+		missingChainIdYaml := []byte(`
+evm:
+`)
+		cfg, err := ParseConfig(missingChainIdYaml)
+		require.NoError(t, err)
+		require.Equal(t, DefaultConfig(), cfg)
+	})
+
+	t.Run("Zero chain_id", func(t *testing.T) {
+		zeroChainIdYaml := []byte(`
+evm:
+  chain_id: 0
+`)
+		cfg, err := ParseConfig(zeroChainIdYaml)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "invalid chain_id: 0 is not a valid EVM chain ID")
+		require.Equal(t, Config{}, cfg)
 	})
 }
 
@@ -48,7 +71,7 @@ func TestGetConfig(t *testing.T) {
 evm:
   chain_id: 67890
 `)
-		err = os.WriteFile(path.Join(tempDir, "config.yaml"), validYaml, 0644)
+		err = os.WriteFile(filepath.Join(tempDir, "config.yaml"), validYaml, 0644)
 		require.NoError(t, err)
 
 		originalHomePath := config.HomePath
@@ -64,16 +87,10 @@ evm:
 		tempDir, err := os.MkdirTemp("", "callisto-test-*")
 		require.NoError(t, err)
 		defer os.RemoveAll(tempDir)
-		tempFile, err := os.CreateTemp("", "config-*.yaml")
-		require.NoError(t, err)
-		defer os.Remove(tempFile.Name())
 
-		invalidYaml := []byte(`invalid: yaml: content`)
-		_, err = tempFile.Write(invalidYaml)
-		require.NoError(t, err)
-		require.NoError(t, tempFile.Close())
-
-		t.Setenv("JUNO_CONFIG", tempFile.Name())
+		originalHomePath := config.HomePath
+		config.HomePath = tempDir
+		defer func() { config.HomePath = originalHomePath }()
 
 		cfg := ReadConfigFromFile()
 		require.Equal(t, DefaultConfig(), cfg)
