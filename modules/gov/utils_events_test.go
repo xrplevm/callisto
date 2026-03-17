@@ -15,7 +15,7 @@ func TestWeightVoteOptionFromEvents(t *testing.T) {
 	tests := []struct {
 		name      string
 		events    sdk.StringEvents
-		expected  govtypesv1.WeightedVoteOption
+		expected  []govtypesv1.WeightedVoteOption
 		shouldErr bool
 	}{
 		{
@@ -28,7 +28,7 @@ func TestWeightVoteOptionFromEvents(t *testing.T) {
 					},
 				},
 			},
-			govtypesv1.WeightedVoteOption{Option: govtypesv1.OptionYes, Weight: "1.000000000000000000"},
+			[]govtypesv1.WeightedVoteOption{{Option: govtypesv1.OptionYes, Weight: "1.000000000000000000"}},
 			false,
 		},
 		{
@@ -41,7 +41,7 @@ func TestWeightVoteOptionFromEvents(t *testing.T) {
 					},
 				},
 			},
-			govtypesv1.WeightedVoteOption{Option: govtypesv1.OptionNo, Weight: "1.000000000000000000"},
+			[]govtypesv1.WeightedVoteOption{{Option: govtypesv1.OptionNo, Weight: "1.000000000000000000"}},
 			false,
 		},
 		{
@@ -54,7 +54,7 @@ func TestWeightVoteOptionFromEvents(t *testing.T) {
 					},
 				},
 			},
-			govtypesv1.WeightedVoteOption{},
+			[]govtypesv1.WeightedVoteOption{},
 			true,
 		},
 	}

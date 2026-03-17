@@ -4,7 +4,7 @@ Callisto is a blockchain indexer (formerly BDJuno) built on the Juno framework d
 
 ## Requirements
 
-- Go 1.23.4
+- Go 1.23.8
 - PostgreSQL 13+
 - Docker & Docker Compose
 - Hasura 2.6.1+ (included in docker-compose)
@@ -16,8 +16,8 @@ Callisto is a blockchain indexer (formerly BDJuno) built on the Juno framework d
 Using GVM (Go Version Manager):
 
 ```bash
-gvm install go1.23.4
-gvm use go1.23.4
+gvm install go1.23.8
+gvm use go1.23.8
 ```
 
 ### 2. Build
@@ -135,35 +135,6 @@ Default database credentials (from docker-compose.yml):
 | `callisto start` | Start continuous block indexing |
 | `callisto version` | Display version information |
 | `callisto migrate` | Migrate database between versions |
-
-## Configuration
-
-### Actions Module
-
-The actions module provides an HTTP server for Hasura actions:
-
-```yaml
-actions:
-  host: "127.0.0.1"
-  port: 3000
-  node:
-    rpc: "http://localhost:26657"
-    grpc: "http://localhost:9090"
-```
-
-### Hasura Configuration
-
-Located in `hasura/config.yaml`:
-
-```yaml
-version: 3
-endpoint: http://localhost:8080
-metadata_directory: metadata
-migrations_directory: migrations
-actions:
-  kind: synchronous
-  handler_webhook_baseurl: http://localhost:3000
-```
 
 ## Database Schema
 
