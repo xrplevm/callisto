@@ -93,3 +93,107 @@ format:
 clean:
 	rm -f tools-stamp ./build/**
 .PHONY: clean
+
+###############################################################################
+###                                 Config                                  ###
+###############################################################################
+
+update-config:
+	@echo "Copying $(CONFIG) to ~/.callisto/config.yaml..."
+	@mkdir -p ~/.callisto
+	@cp $(CONFIG) ~/.callisto/config.yaml
+	@echo "Config updated successfully"
+.PHONY: update-config
+
+init-config:
+	@echo "Initializing callisto config..."
+	@./build/callisto init
+.PHONY: init-config
+
+###############################################################################
+###                                Database                                ###
+###############################################################################
+
+DB_CONTAINER := $(shell docker compose ps -q database 2>/dev/null)
+DB_EXEC := docker compose exec -T database psql -U user -d database
+
+db-schema-drop:
+	@echo "Dropping all tables..."
+	@$(DB_EXEC) -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+	@echo "All tables dropped"
+.PHONY: db-schema-drop
+
+db-schema-apply:
+	@echo "Applying schema files..."
+	@for f in $(sort $(wildcard database/schema/*.sql)); do \
+		echo "  Applying $$f..."; \
+		$(DB_EXEC) < $$f; \
+	done
+	@echo "Schema applied successfully"
+.PHONY: db-schema-apply
+
+db-schema-reset: db-schema-drop db-schema-apply
+	@echo "Schema reset complete"
+.PHONY: db-schema-reset
+
+db-shell:
+	@docker compose exec database psql -U user -d database
+.PHONY: db-shell
+
+db-tables:
+	@$(DB_EXEC) -c "\dt"
+.PHONY: db-tables
+
+db-size:
+	@$(DB_EXEC) -c "SELECT schemaname, tablename, pg_size_pretty(pg_total_relation_size(schemaname || '.' || tablename)) AS size FROM pg_tables WHERE schemaname = 'public' ORDER BY pg_total_relation_size(schemaname || '.' || tablename) DESC;"
+.PHONY: db-size
+
+###############################################################################
+###                              Local development                          ###
+###############################################################################
+
+setup-env:
+	@ARCH=$$(uname -m); \
+	if [ "$$ARCH" = "arm64" ] || [ "$$ARCH" = "aarch64" ]; then \
+		echo "HASURA_IMAGE_SUFFIX=.ubuntu.arm64" > .env; \
+		echo "Detected ARM architecture"; \
+	else \
+		echo "HASURA_IMAGE_SUFFIX=" > .env; \
+		echo "Detected x86 architecture"; \
+	fi
+.PHONY: setup-env
+
+start: setup-env update-config build
+	@echo "Starting database services..."
+	@docker compose up -d
+	@echo "Waiting for database to be ready..."
+	@sleep 3
+	@echo "Starting callisto..."
+	@./build/callisto start
+.PHONY: start
+
+start-clean: setup-env update-config build
+	@echo "Starting database services..."
+	@docker compose up -d
+	@echo "Waiting for database to be ready..."
+	@sleep 3
+	@$(MAKE) db-schema-reset
+	@echo "Starting callisto..."
+	@./build/callisto start
+.PHONY: start-clean
+
+start-testnet: CONFIG=configs/testnet-config.yaml
+start-testnet: start
+.PHONY: start-testnet
+
+start-testnet-clean: CONFIG=configs/testnet-config.yaml
+start-testnet-clean: start-clean
+.PHONY: start-testnet-clean
+
+start-mainnet: CONFIG=configs/mainnet-config.yaml
+start-mainnet: start
+.PHONY: start-mainnet
+
+start-mainnet-clean: CONFIG=configs/mainnet-config.yaml
+start-mainnet-clean: start-clean
+.PHONY: start-mainnet-clean
